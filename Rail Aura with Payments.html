@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Ticket Reservation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items:flex-start;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4CAF50, #2C9E2C);
+            color: #fff;
+            flex-direction: column;
+            padding-top: 50px;
+        }
+         
+
+        /* Logo Styling */
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 150px; /* Adjust the size */
+            height: auto;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+            margin-top: 30px;
+            margin-left: 500px;
+            margin-bottom: 100px;
+        }
+
+        .login-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        small {
+            display: block;
+            color: #777;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* Ticket Reservation Styles */
+        .ticket-reservation {
+            display: none;
+            background-image: url('https://assets.dmagstatic.com/wp-content/uploads/2020/02/Shinkansen-Trains-in-Japan.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Main Title */
+        .main-title {
+            font-size: 3rem;
+            margin-top: 30px;
+            color: #ffbf00;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .form-section {
+            width: 80%;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-title {
+            font-size: 2.5rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f9;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        td input, td select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        td input[type="checkbox"] {
+            width: auto;
+        }
+
+        .button {
+            width: 48%;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            position: static;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .tab {
+            background-color: #f4f4f9;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .form-section h3 {
+            margin-top: 30px;
+            color: #333;
+        }
+        /* Popup container - hidden by default */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000; /* Above other elements */
+    width: 50%;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+/* Background overlay */
+.overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999; /* Below the popup but above the rest */
+}
+
+/* Close button styles */
+.close-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 9px 9px;
+    cursor: pointer;
+    float: right;
+    border-radius: 4px;
+    position: absolute;
+            top: 20px;
+            left: 570px;
+            right: 80px;
+            width: 100px; /* Adjust the size */
+            height: auto;
+    
+    
+}
+
+.close-btn:hover {
+    background-color: darkred;
+} 
+        
+         /* Ticket Styling */
+         body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #004d40, #00796b); /* Darker dual-tone gradient background */
+            color: #ffffff; /* White text for contrast */
+            padding: 20px;
+            margin: 0;
+        }
+
+        .ticket-container {
+            display: none; /* Hidden initially */
+            margin-top: 30px;
+            background-color: #2c3e50; /* Darker shade for the ticket container */
+            padding: 30px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            text-align: center;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            border: 2px solid #00796b; /* Dark teal border */
+        }
+
+        .ticket-container h2 {
+            color: #ecf0f1; /* Light color for the title */
+            font-size: 2.5rem; /* Larger font size */
+            margin-bottom: 20px; /* Space below the title */
+            font-weight: bold; /* Bold title */
+        }
+
+        .ticket-details {
+            border: 1px solid #1abc9c; /* Teal border */
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px; /* Rounded corners */
+            background-color: #34495e; /* Slightly lighter dark blue for details */
+        }
+
+        .ticket-details p {
+            font-size: 1.2rem; /* Increased font size for readability */
+            margin-bottom: 15px; /* Space between paragraphs */
+            color: #ecf0f1; /* Light text color */
+        }
+
+        .ticket-details span {
+            font-weight: bold; /* Bold for labels */
+            color: #1abc9c; /* Teal color for labels */
+        }
+
+        .download-button {
+            background-color: #1abc9c; /* Teal background */
+            color: white; /* White text */
+            padding: 12px 20px;
+            border: none;
+            font-size: 16px;
+            border-radius: 6px; /* Rounded corners */
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+        }
+
+        .download-button:hover {
+            background-color: #16a085; /* Darker teal on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        .back-button {
+            background-color: #1abc9c; /* Red background for the back button */
+            color: white; /* White text */
+            padding: 12px 20px;
+            border: none;
+            font-size: 16px;
+            border-radius: 6px; /* Rounded corners */
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+        }
+
+        .back-button:hover {
+            background-color: #16a085; /* Darker red on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 10px;
+        }
+
+        footer a {
+            color: #4CAF50; /* Green color for links */
+            text-decoration: none; /* Remove underline */
+        }
+
+        footer a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+        
+    </style>
+    <script>
+         // Function to show ticket reservation page after login
+        function redirectToTicketReservation(event) {
+            event.preventDefault(); // Prevent form submission for demo
+
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const errorMessage = document.getElementById('error-message');
+
+            // Clear previous error message
+            errorMessage.innerHTML = '';
+
+            // Simple validation
+            if (!phone || !email || !address) {
+                errorMessage.innerHTML = 'Please fill in all fields.';
+                return;
+            }
+
+            // Hide login form and show ticket reservation form
+            document.querySelector('.login-container').style.display = 'none';
+            document.querySelector('.ticket-reservation').style.display = 'block';
+        }
+
+         function redirectToPayment(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+
+            // Hide ticket reservation page
+        document.querySelector('.ticket-reservation').style.display = 'none';
+             
+              // Show payment page
+        document.querySelector('.payment-container').style.display = 'block';
+        }
+        
+        function handlePayment(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Get payment details
+        const cardNumber = document.getElementById('cardNumber').value;
+        const expiryDate = document.getElementById('expiryDate').value;
+        const cvv = document.getElementById('cvv').value;
+
+        // Simple validation
+        if (!cardNumber || !expiryDate || !cvv) {
+            alert("Please fill in all fields.");
+            return;
+            
+            }
+
+        // Simulate successful payment process
+        alert("Payment processed successfully!");
+        
+
+        // Hide payment page and show ticket page
+        document.querySelector('.payment-container').style.display = 'none';
+        document.querySelector('.ticket-container').style.display = 'block';
+
+        // Call showTicket function if necessary to display ticket details
+        showTicket(event);
+    }
+
+
+        function showTicket(event) {
+            event.preventDefault();
+
+            const travelDate = document.querySelector('input[name="travelDate"]').value;
+            const from = document.querySelector('input[name="from"]').value;
+            const to = document.querySelector('input[name="to"]').value;
+            const seats = document.querySelector('input[name="seats"]').value;
+
+            // Display the ticket container and hide the payment form
+            const ticketContainer = document.querySelector('.ticket-container');
+            ticketContainer.style.display = 'block';
+
+            const ticketDetails = document.querySelector('.ticket-details');
+            ticketDetails.innerHTML = ''; // Clear previous ticket details
+
+            // Gather passenger details
+            for (let i = 1; i <= 5; i++) {
+                const passengerName = document.querySelector(`input[name="passenger${i}"]`).value;
+                const passengerAge = document.querySelector(`input[name="age${i}"]`).value;
+                const passengerGender = document.querySelector(`select[name="gender${i}"]`).value;
+                const isSeniorCitizen = document.querySelector(`input[name="seniorCitizen${i}"]`).checked ? 'Yes' : 'No';
+                const needsBedRoll = document.querySelector(`input[name="bedRoll${i}"]`).checked ? 'Yes' : 'No';
+
+                if (passengerName) { // Only show details for passengers with names
+                    ticketDetails.innerHTML += `
+                        <p><span>Passenger Name:</span> ${passengerName}</p>
+                        <p><span>Age:</span> ${passengerAge}</p>
+                        <p><span>Gender:</span> ${passengerGender}</p>
+                        <p><span>Senior Citizen:</span> ${isSeniorCitizen}</p>
+                        <p><span>Bed Roll Required:</span> ${needsBedRoll}</p>
+                        <hr>
+                    `;
+                }
+            }
+
+            // Display common travel details
+            ticketDetails.innerHTML += `
+                <p><span>Travel Date:</span> ${travelDate}</p>
+                <p><span>From:</span> ${from}</p>
+                <p><span>To:</span> ${to}</p>
+                <p><span>Seats Booked:</span> ${seats}</p>
+                <p><span>Ticket Confirmation:</span> Booked Successfully!</p>
+            `;
+
+          
+        }
+
+        function downloadTicket() {
+            const { jsPDF } = window.jspdf; // Access jsPDF from the window object
+            const doc = new jsPDF();
+
+            // Get ticket details
+            const ticketDetails = document.querySelector('.ticket-details').innerHTML;
+
+            // Add content to PDF
+            doc.setFontSize(16);
+            doc.text("Your Ticket", 20, 20);
+            doc.setFontSize(12);
+            doc.text(ticketDetails.replace(/<[^>]+>/g, ''), 20, 40); // Remove HTML tags
+
+            // Save the PDF
+            doc.save('ticket.pdf');
+        }
+        
+    </script>
+    
+    
+</head>
+<body>
+<!-- Popup Component -->
+<div class="overlay" id="customOverlay"></div>
+<div class="popup" id="customPopup">
+    <button class="close-btn" id="customCloseBtn">X</button>
+    <h2 id="popupTitle">Popup Title</h2>
+    <p id="popupContent">This is the content of the popup section.</p>
+</div>
+ 
+
+     <!-- Logo -->
+    <img src="https://iconape.com/wp-content/png_logo_vector/rail-tickets-logo.png" alt="RailAura Logo" class="logo">
+
+    <!-- Login Page -->
+    <div class="login-container">
+        <h2>RAIL AURA <br> Welcomes You</h2>
+        <!-- Error message placeholder -->
+        <div id="error-message" class="error-message"></div>
+
+        <form id="loginForm" onsubmit="redirectToTicketReservation(event)">
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required pattern="^\+?[0-9]{1,4}?[-.\s]?[0-9]{1,15}$" aria-describedby="phoneHelp">
+
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email address" required aria-describedby="emailHelp">
+
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" placeholder="Enter your address" required>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Ticket Reservation Page (Initially Hidden) -->
+    <div class="ticket-reservation">
+        <!-- Main Title -->
+        <h1 class="main-title">Ticket Reservation</h1>
+
+        <!-- Reservation Form Section -->
+        <div class="form-section">
+            <h2 class="form-title">Travel Information</h2>
+            <div class="tab"> RAIL AURA ENTERPRISES</div>
+            <form id="ticketForm" onsubmit="redirectToPayment(event)">
+                <!-- Travel Details -->
+                <table>
+                    <tr>
+                        <td>Travel Date:</td>
+                        <td><input type="date" name="travelDate"></td>
+                    </tr>
+                    <tr>
+                        <td>From:</td>
+                        <td><input type="text" name="from" maxlength="20" placeholder="From"></td>
+                        <td>To:</td>
+                        <td><input type="text" name="to" maxlength="20" placeholder="To"></td>
+                        <td>Seat(s):</td>
+                        <td><input type="number" name="seats" min="1" max="100" value="1"></td>
+                    </tr>
+                </table>
+
+                <!-- Passenger Details -->
+                <h3>Passenger Details</h3>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Senior Citizen</th>
+                        <th>Bed Roll</th>
+                    </tr>
+                    <!-- Add more rows -->
+                    <tr>
+                        <td><input type="text" name="passenger1" placeholder="Enter Name"></td>
+                        <td><input type="number" name="age1" placeholder="Enter Age"></td>
+                        <td>
+                            <select name="gender1">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                        <td><input type="checkbox" name="seniorCitizen1"></td>
+                        <td><input type="checkbox" name="bedRoll1"></td>
+                    </tr>
+                    <!-- Additional rows -->
+                    <tr>
+                        <td><input type="text" name="passenger2" placeholder="Enter Name"></td>
+                        <td><input type="number" name="age2" placeholder="Enter Age"></td>
+                        <td>
+                            <select name="gender2">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                        <td><input type="checkbox" name="seniorCitizen2"></td>
+                        <td><input type="checkbox" name="bedRoll2"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="passenger3" placeholder="Enter Name"></td>
+                        <td><input type="number" name="age3" placeholder="Enter Age"></td>
+                        <td>
+                            <select name="gender3">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                        <td><input type="checkbox" name="seniorCitizen3"></td>
+                        <td><input type="checkbox" name="bedRoll3"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="passenger4" placeholder="Enter Name"></td>
+                        <td><input type="number" name="age4" placeholder="Enter Age"></td>
+                        <td>
+                            <select name="gender4">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                        <td><input type="checkbox" name="seniorCitizen4"></td>
+                        <td><input type="checkbox" name="bedRoll4"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="passenger5" placeholder="Enter Name"></td>
+                        <td><input type="number" name="age5" placeholder="Enter Age"></td>
+                        <td>
+                            <select name="gender5">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                        <td><input type="checkbox" name="seniorCitizen5"></td>
+                        <td><input type="checkbox" name="bedRoll5"></td>
+                    </tr>
+                </table>
+
+                <!-- Children Passenger Details -->
+                <h3>Children Passenger (Below 5 Years)</h3>
+                <table>
+                    <tr>
+                        <th>Child Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="child1" placeholder="Enter Name"></td>
+                        <td><input type="number" name="childAge1" placeholder="Enter Age" max="5"></td>
+                        <td>
+                            <select name="childGender1">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Added additional row for child -->
+                    <tr>
+                        <td><input type="text" name="child2" placeholder="Enter Name"></td>
+                        <td><input type="number" name="childAge2" placeholder="Enter Age" max="5"></td>
+                        <td>
+                            <select name="childGender2">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Terms Checkbox -->
+                <input type="checkbox" id="agreeTerms" name="agreeTerms"> I agree to the terms and conditions.<br><br>
+
+                <div>
+                    <button class="button" type="submit">Book Ticket</button>
+                    <button class="button" type="reset">Clear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Payment Page (Initially Hidden) -->
+<div class=" container payment-container" style="display: none;">
+    <h2>Payment Page</h2>
+    <div class="details">
+        <p>Please enter your payment details to complete the transaction.</p>
+        <form onsubmit="showTicket(event)">
+            <label for="cardNumber">Card Number:</label>
+            <input type="text" id="cardNumber" name="cardNumber" placeholder="Enter your card number" required>
+
+            <label for="expiryDate">Expiry Date:</label>
+            <input type="date" id="expiryDate" name="expiryDate" required>
+
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" placeholder="Enter CVV" required>
+
+            <button class="download-button" type="submit">Pay Now</button>
+        </form>
+    </div>
+</div>
+    
+    <!-- Ticket Page (Initially Hidden) -->
+<div class="ticket-container">
+    <button class="download-button" onclick="downloadTicket()">Download Ticket</button>
+    <h2>Your Ticket</h2>
+    <div class="ticket-details">
+        <p><span>Passenger Name:</span> John Doe</p>
+        <p><span>Age:</span> 30</p>
+        <p><span>Gender:</span> Male</p>
+        <p><span>Travel Date:</span> 2024-05-01</p>
+        <p><span>From:</span> New York</p>
+        <p><span>To:</span> Los Angeles</p>
+        <p><span>Seats Booked:</span> 2</p>
+        <p><span>Ticket Confirmation:</span> Booked Successfully!</p>
+    </div>
+    <button class="back-button" onclick="window.location.reload()">Back to Home</button>
+</div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 Janhvi Ticketing Portal |
+All rights reserved. |<a href="C:\Users\Dell\Desktop\safe\Backend\Termly's Privacy Notice - Termly.html"> Privacy Policy</a>|<a href="1234">Terms of Service</a> |Contact: <a href="mailto:bhojkrishna852@gmail.com">bussines@railaura.com</a><br>
+Follow us on <a href="123"> Facebook</a>,<a href="123"> Telegram</a>,<a href="123"> Instagram</a>,<a href="https://www.linkedin.com/in/krishna-bhoj-344ab3323/">Linkdin</a>
+
+</p>
+    </footer>
+
+</body>
+</html>
